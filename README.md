@@ -199,7 +199,7 @@ Where:
 | MS-CLAP | Automatic (via msclap package) | Version 2023 |
 | LAION-CLAP | Automatic (via HuggingFace) | Multiple variants available |
 | MGA-CLAP | [Download](https://github.com/Ming-er/mga-clap) | Place in `pretrained_models/mga-clap.pt` |
-| M2D-CLAP | [Download](https://github.com/nttcslab/m2d-clap) | Place in `pretrained_models/m2d_clap_*/` |
+| M2D-CLAP | [Download](https://github.com/nttcslab/m2d) | Place in `pretrained_models/m2d_clap_*/` |
 
 ### LALM Models
 
