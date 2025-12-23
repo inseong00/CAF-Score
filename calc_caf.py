@@ -30,22 +30,21 @@ def eval_caf_on_dataset(args):
         
     clap_result_json = f"{args.data_dir}/results/clap/{args.clap_model}_{args.dataset}.json"
     if args.use_slide_window:
-        clap_result_json = f"{args.data_dir}/results/clap/{args.clap_model}_slide_{args.dataset}.json"
         if args.pooling == 'max':
             clap_result_json = f"{args.data_dir}/results/clap/{args.clap_model}_slide_max_{args.dataset}.json"
+        elif args.pooling == 'mean':
+            clap_result_json = f"{args.data_dir}/results/clap/{args.clap_model}_slide_mean_{args.dataset}.json"
     with open(clap_result_json, 'r') as f:
         clap_results = json.load(f)
         
-    if args.avg_method == 'weighted':
-        output_json_path = f"{args.data_dir}/results/caf/{args.dataset}/{args.lalm_model}_{args.clap_model}/{args.avg_method}_{int(args.alpha*10)}.json"
-    elif args.avg_method == 'harmonic':
-        output_json_path = f"{args.data_dir}/results/caf/{args.dataset}/{args.lalm_model}_{args.clap_model}/{args.avg_method}_{int(args.beta*10)}.json"
+    output_json_path = f"{args.data_dir}/results/caf/{args.dataset}/{args.lalm_model}_{args.clap_model}/{int(args.alpha*10)}.json"
     if args.use_think_mode:
         output_json_path = output_json_path.replace(args.lalm_model, f"{args.lalm_model}_think")
     if args.use_slide_window:
-        output_json_path = output_json_path.replace(f"{args.clap_model}", f"{args.clap_model}_slide")
         if args.pooling == 'max':
-            output_json_path = output_json_path.replace(f"{args.clap_model}_slide", f"{args.clap_model}_slide_max")
+            output_json_path = output_json_path.replace(f"{args.clap_model}", f"{args.clap_model}_slide_max")
+        elif args.pooling == 'mean':
+            output_json_path = output_json_path.replace(f"{args.clap_model}", f"{args.clap_model}_slide_mean")
 
     # Ensure output directory exists
     os.makedirs(os.path.dirname(output_json_path), exist_ok=True)
@@ -71,8 +70,6 @@ def eval_caf_on_dataset(args):
     results_pair = zip(lalm_results[1]['Results'], clap_results[1]['Results'])
     
     for idx, (lalm_item, clap_item) in enumerate(results_pair):
-        if args.max_samples is not None and idx >= args.max_samples:
-            break
         new_item = {}
         subset = 'main' if 'main' in args.dataset else 'hallu'
         for lalm_key, clap_key in zip(lalm_item.keys(), clap_item.keys()):
@@ -97,16 +94,10 @@ def eval_caf_on_dataset(args):
             raw_score1 = raw_score1 if raw_score1 is not None else 0
             
             # Combine scores to get CAF score
-            if args.avg_method == 'weighted':
-                caf_score0 = args.alpha * clap_score0 + (1 - args.alpha) * fleur_score0
-                caf_score1 = args.alpha * clap_score1 + (1 - args.alpha) * fleur_score1
-                raw_caf_score0 = args.alpha * clap_score0 + (1 - args.alpha) * raw_score0
-                raw_caf_score1 = args.alpha * clap_score1 + (1 - args.alpha) * raw_score1
-            elif args.avg_method == 'harmonic':
-                caf_score0 = (1 + args.beta**2) * (clap_score0 * fleur_score0) / ((args.beta**2) * clap_score0 + fleur_score0 + 1e-8)
-                caf_score1 = (1 + args.beta**2) * (clap_score1 * fleur_score1) / ((args.beta**2) * clap_score1 + fleur_score1 + 1e-8)
-                raw_caf_score0 = (1 + args.beta**2) * (clap_score0 * raw_score0) / ((args.beta**2) * clap_score0 + raw_score0 + 1e-8)
-                raw_caf_score1 = (1 + args.beta**2) * (clap_score1 * raw_score1) / ((args.beta**2) * clap_score1 + raw_score1 + 1e-8)
+            caf_score0 = args.alpha * clap_score0 + (1 - args.alpha) * fleur_score0
+            caf_score1 = args.alpha * clap_score1 + (1 - args.alpha) * fleur_score1
+            raw_caf_score0 = args.alpha * clap_score0 + (1 - args.alpha) * raw_score0
+            raw_caf_score1 = args.alpha * clap_score1 + (1 - args.alpha) * raw_score1
 
             # Prediction: higher caf score means better match (label 0)
             if subset == 'main':
@@ -240,41 +231,23 @@ def main():
         help='Whether to use thinking model variant'
     )
     parser.add_argument(
-        '--avg_method',
-        type=str,
-        default='weighted',
-        choices=['weighted', 'harmonic'],
-    )
-    parser.add_argument(
         '--alpha',
         type=float,
-        default=0.5,
+        default=0.8,
         help='Weighting factor for combining CLAP and FLEUR scores'
-    )
-    parser.add_argument(
-        '--beta',
-        type=float,
-        default=1.0,
-        help='Exponent factor for CLAP scores when combining'
     )
     parser.add_argument(
         '--pooling',
         type=str,
         default='max',
         choices=['mean', 'max'],
-        help='Pooling method for SLIDE-CLAP.'
+        help='Pooling method for sliding window'
     )
     parser.add_argument(
         '--data_dir',
         type=str,
         default='data',
         help='Path to the dataset directory'
-    )
-    parser.add_argument(
-        '--max_samples',
-        type=int,
-        default=None,
-        help='Maximum number of samples to evaluate (default: all)'
     )
 
     args = parser.parse_args()

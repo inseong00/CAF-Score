@@ -23,31 +23,31 @@ def eval_clap_on_dataset(args):
     Returns:
         dict: A dictionary with audio file names as keys and their corresponding embeddings as values.
     """
-    with open(args.json_path, 'r') as f:
+    if args.dataset == 'clotho_main':
+        json_path = f"{args.data_dir}/meta/BRACE_Clotho_Main_Processed.json"
+        audio_dir = f"{args.data_dir}/audio/clotho"
+        subset = 'main'
+    elif args.dataset == 'clotho_hallu':
+        json_path = f"{args.data_dir}/meta/BRACE_Clotho_Hallu_Processed.json"
+        audio_dir = f"{args.data_dir}/audio/clotho"
+        subset = 'hallu'
+    elif args.dataset == 'audiocaps_main':
+        json_path = f"{args.data_dir}/meta/BRACE_AudioCaps_Main_Processed.json"
+        audio_dir = f"{args.data_dir}/audio/audiocaps"
+        subset = 'main'
+    elif args.dataset == 'audiocaps_hallu':
+        json_path = f"{args.data_dir}/meta/BRACE_AudioCaps_Hallu_Processed.json"
+        audio_dir = f"{args.data_dir}/audio/audiocaps"
+        subset = 'hallu'
+        
+    with open(json_path, 'r') as f:
         dataset = json.load(f)
         
-    if args.output_json is not None:
-        output_json_path = args.output_json
+
+    if args.use_slide_window:
+        output_json_path = f'data/results/clap/{args.clap_model}_slide_{args.pooling}_{args.dataset}.json'
     else:
-        if 'Clotho' in args.json_path:
-            dataset_name = 'clotho'
-            
-        elif 'AudioCaps' in args.json_path:
-            dataset_name = 'audiocaps'
-        
-        else:
-            raise ValueError("Please provide output_json path or use a recognized json_path containing 'Clotho' or 'AudioCaps'.")
-        audio_dir = f"{args.audio_dir}/{dataset_name}"
-        if 'Main' in args.json_path:
-            subset = 'main'
-        elif 'Hallu' in args.json_path:
-            subset = 'hallu'
-        else:
-            raise ValueError("Please provide output_json path or use a recognized json_path containing 'Main' or 'Hallu'.")
-        if args.use_slide_window:
-            output_json_path = f'data/results/clap/{args.clap_model}_slide_{args.pooling}_{dataset_name}_{subset}.json'
-        else:
-            output_json_path = f'data/results/clap/{args.clap_model}_{dataset_name}_{subset}.json'
+        output_json_path = f'data/results/clap/{args.clap_model}_{args.dataset}.json'
     clap_model = load_clap(args.clap_model)
     hh_total = 0
     hh_correct = 0
@@ -139,12 +139,37 @@ def eval_clap_on_dataset(args):
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument('--clap_model', type=str, required=True, help='Path to the CLAP model name.')
-    parser.add_argument('--json_path', type=str, default='data/meta/BRACE_AudioCaps_Hallu_Processed.json', help='Path to the JSON file containing dataset information.')
-    parser.add_argument('--audio_dir', type=str, default='data/audio', help='Directory containing audio files.')
-    parser.add_argument('--output_json', type=str, default= None, help='Path to save the evaluation results.')
-    parser.add_argument('--use_slide_window', action='store_true', default=False, help='Whether to use sliding window for long audio.')
-    parser.add_argument('--pooling', type=str, default='max', choices=['mean', 'max'],help='Pooling method for SLIDE-CLAP.')
+    parser.add_argument(
+        '--clap_model', 
+        type=str,
+        required=True,
+        choices=['msclap','laionclap', 'mgaclap', 'm2dclap'],
+        help='CLAP model name to use'
+    )
+    parser.add_argument(
+        '--dataset',
+        type=str,
+        required=True,
+        choices=['clotho_main', 'clotho_hallu', 'audiocaps_main', 'audiocaps_hallu'],
+        help='Dataset to evaluate on'
+    )
+    parser.add_argument(
+        '--data_dir',
+        type=str,
+        default='data',
+        help='Path to the dataset directory'
+    )
+    parser.add_argument('--use_slide_window',
+        action='store_true', 
+        default=False, 
+        help='Whether to use sliding window for long audio.'
+    )
+    parser.add_argument('--pooling', 
+        type=str, 
+        default='max', 
+        choices=['mean', 'max'],
+        help='Pooling method for sliding window'
+    )
     args = parser.parse_args()
 
     results = eval_clap_on_dataset(args)

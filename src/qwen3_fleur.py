@@ -1,8 +1,8 @@
 """
-FLEUR (Flexible Evaluation Using Language Models) for Qwen3-Omni
+FLEUR for Qwen3-Omni
 
 This script implements FLEUR metric evaluation for audio captions using Qwen3-Omni models.
-FLEUR uses an LLM to evaluate caption quality on a 0.0-1.0 scale with score smoothing
+FLEUR uses an LMLM to evaluate caption quality on a 0.0-1.0 scale with score smoothing
 based on token probability distributions.
 
 Reference: FLEUR: An Explainable Reference-Free Evaluation Metric for Image Captioning

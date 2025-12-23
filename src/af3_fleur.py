@@ -1,8 +1,8 @@
 """
-FLEUR (Flexible Evaluation Using Language Models) for Audio-Flamingo-3
+FLEUR for Audio-Flamingo-3
 
 This script implements FLEUR metric evaluation for audio captions using NVIDIA Audio-Flamingo-3 models.
-FLEUR uses an LLM to evaluate caption quality on a 0.0-1.0 scale with score smoothing
+FLEUR uses an LMLM to evaluate caption quality on a 0.0-1.0 scale with score smoothing
 based on token probability distributions.
 
 Reference: FLEUR: An Explainable Reference-Free Evaluation Metric for Image Captioning

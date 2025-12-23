@@ -2,10 +2,10 @@
 Unified CLAP Model Loader and Similarity Scorer
 
 Supports:
-- MS-CLAP (Microsoft CLAP)
-- LAION-CLAP (LAION CLAP)
-- MGA-CLAP (Modality-shared Guided Attention CLAP)
-- M2D-CLAP (Masked Modeling Duo CLAP)
+- MS-CLAP
+- LAION-CLAP
+- MGA-CLAP
+- M2D-CLAP
 
 Returns logits (audio-text similarity scores) with optional sliding window for long audio.
 """

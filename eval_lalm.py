@@ -24,32 +24,29 @@ def eval_lalm_on_dataset(args):
     Returns:
         dict: Accuracy results for HH, HM, MM categories
     """
-    with open(args.json_path, 'r') as f:
+    if args.dataset == 'clotho_main':
+        json_path = f"{args.data_dir}/meta/BRACE_Clotho_Main_Processed.json"
+        audio_dir = f"{args.data_dir}/audio/clotho"
+        subset = 'main'
+    elif args.dataset == 'clotho_hallu':
+        json_path = f"{args.data_dir}/meta/BRACE_Clotho_Hallu_Processed.json"
+        audio_dir = f"{args.data_dir}/audio/clotho"
+        subset = 'hallu'
+    elif args.dataset == 'audiocaps_main':
+        json_path = f"{args.data_dir}/meta/BRACE_AudioCaps_Main_Processed.json"
+        audio_dir = f"{args.data_dir}/audio/audiocaps"
+        subset = 'main'
+    elif args.dataset == 'audiocaps_hallu':
+        json_path = f"{args.data_dir}/meta/BRACE_AudioCaps_Hallu_Processed.json"
+        audio_dir = f"{args.data_dir}/audio/audiocaps"
+        subset = 'hallu'
+        
+    with open(json_path, 'r') as f:
         dataset = json.load(f)
-
-    if args.output_json is not None:
-        output_json_path = args.output_json
-    else:
-        if 'Clotho' in args.json_path:
-            dataset_name = 'clotho'
-            
-        elif 'AudioCaps' in args.json_path:
-            dataset_name = 'audiocaps'
-        
-        else:
-            raise ValueError("Please provide output_json path or use a recognized json_path containing 'Clotho' or 'AudioCaps'.")
-        audio_dir = f"{args.audio_dir}/{dataset_name}"
-        
-        if 'Main' in args.json_path:
-            subset = 'main'
-        elif 'Hallu' in args.json_path:
-            subset = 'hallu'
-        else:
-            raise ValueError("Please provide output_json path or use a recognized json_path containing 'Main' or 'Hallu'.")
-
-        output_json_path = f'data/results/lalm/{args.lalm_model}_{dataset_name}_{subset}.json'
-        if args.use_think_mode:
-            output_json_path = output_json_path.replace('.json', '_think.json')
+    
+    output_json_path = f'data/results/lalm/{args.lalm_model}_{args.dataset}.json'
+    if args.use_think_mode:
+        output_json_path = output_json_path.replace('.json', '_think.json')
 
     # Ensure output directory exists
     os.makedirs(os.path.dirname(output_json_path), exist_ok=True)
@@ -231,22 +228,17 @@ def main():
         help='LALM model to use'
     )
     parser.add_argument(
-        '--json_path',
+        '--dataset',
         type=str,
-        default='data/meta/BRACE_Clotho_Hallu_Processed.json',
-        help='Path to the JSON file containing dataset information'
+        required=True,
+        choices=['clotho_main', 'clotho_hallu', 'audiocaps_main', 'audiocaps_hallu'],
+        help='Dataset to evaluate on'
     )
     parser.add_argument(
-        '--audio_dir',
+        '--data_dir',
         type=str,
-        default='data/audio',
-        help='Directory containing audio files'
-    )
-    parser.add_argument(
-        '--output_json',
-        type=str,
-        default=None,
-        help='Path to save the evaluation results'
+        default='data',
+        help='Path to the dataset directory'
     )
     parser.add_argument(
         '--use_think_mode',
@@ -265,12 +257,6 @@ def main():
         type=float,
         default=0.95,
         help='GPU memory utilization for Qwen3-Omni (default: 0.95)'
-    )
-    parser.add_argument(
-        '--max_samples',
-        type=int,
-        default=None,
-        help='Maximum number of samples to evaluate (default: all)'
     )
 
     args = parser.parse_args()
