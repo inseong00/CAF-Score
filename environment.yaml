@@ -14,24 +14,23 @@ channels:
 dependencies:
   - python=3.10
   - pip
-  - cudatoolkit=12.1
 
   # Core scientific packages
-  - numpy>=1.26.0
-  - scipy>=1.15.0
-  - pandas>=2.0.0
-  - scikit-learn>=1.5.0
+  - numpy
+  - scipy
+  - pandas
+  - scikit-learn
 
   # Audio processing
-  - librosa>=0.10.0
-  - soundfile>=0.13.0
+  - librosa
+  - pysoundfile
 
   # Visualization (optional)
-  - matplotlib>=3.8.0
+  - matplotlib
 
   # Development tools
-  - tqdm>=4.65.0
-  - pyyaml>=6.0
+  - tqdm
+  - pyyaml
 
   - pip:
     # PyTorch ecosystem (CUDA 12.1)
@@ -62,4 +61,4 @@ dependencies:
 
     # Utilities
     - joblib>=1.4.0
-    - regex>=2024.0.0
+    - regex
