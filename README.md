@@ -34,7 +34,7 @@ data/
 
 ## Project Structure
 
-```
+```bash
 CAF_Score/
 ├── run_caf.py            # Single audio-caption CAF-Score computation
 ├── eval_caf.py           # Direct CAF-Score evaluation on BRACE dataset
