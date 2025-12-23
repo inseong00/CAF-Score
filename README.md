@@ -31,6 +31,7 @@ data/
 └── audio/
     ├── clotho/        # Place Clotho audio files here (.wav)
     └── audiocaps/     # Place AudioCaps audio files here (.wav)
+```
 
 ## Project Structure
 
