@@ -1,6 +1,6 @@
 # CAF-Score: CAF-Score: Calibrating CLAP with LALMs for Reference-Free Audio Caption Evaluation
 
-CAF-Score is a comprehensive reference-free audio-caption alignment evaluation metric that combines **CLAP** (Contrastive Language-Audio Pretraining) similarity scores with **FLEUR** scores from Large Audio Language Models (LALMs).
+CAF-Score is a comprehensive reference-free audio-caption alignment evaluation metric that combines **CLAP** (Contrastive Language-Audio Pretraining) similarity scores with **[FLEUR](https://github.com/Yebin46/FLEUR)** scores from Large Audio Language Models (LALMs).
 
 ## Overview
 
