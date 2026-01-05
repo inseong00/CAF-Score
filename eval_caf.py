@@ -47,7 +47,7 @@ def eval_caf_on_dataset(args):
         dataset = json.load(f)
 
     # Setup output path
-    output_json_path = f"{args.data_dir}/results/caf_direct/{args.dataset}/{args.lalm_model}_{args.clap_model}/alpha_{int(args.alpha*10)}.json"
+    output_json_path = f"{args.data_dir}/results/caf_direct/{args.dataset}/{args.lalm_model}_{args.clap_model}/weighted_{int(args.alpha*10)}.json"
     if args.use_think_mode:
         output_json_path = output_json_path.replace(args.lalm_model, f"{args.lalm_model}_think")
     if args.use_slide_window:

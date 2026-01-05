@@ -135,7 +135,7 @@ Thumbs.db
 
 # Project specific
 data/audio/
-data/results/
+# data/results/
 pretrained_models/*.pt
 pretrained_models/*.pth
 pretrained_models/*/
