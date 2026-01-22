@@ -14,7 +14,7 @@ This repository provides:
 
 Due to dependency conflicts between Audio-Flamingo-3 and Qwen3-Omni, **two separate conda environments** are required.
 
-### Environment 1: Audio-Flamingo-3 (`brace_af3`)
+### Environment 1: Audio-Flamingo-3
 
 ```bash
 # Create environment for Audio-Flamingo-3
@@ -26,7 +26,7 @@ conda activate brace_af3
 
 Use this environment when running evaluations with `--lalm_model audioflamingo3`.
 
-### Environment 2: Qwen3-Omni (`qwen3_omni`)
+### Environment 2: Qwen3-Omni
 
 ```bash
 # Create environment for Qwen3-Omni

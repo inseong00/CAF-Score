@@ -1,4 +1,4 @@
-name: qwen3_omni
+name: caf_qwen3
 channels:
   - conda-forge
   - defaults
