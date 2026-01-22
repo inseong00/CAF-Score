@@ -31,7 +31,7 @@ def compute_caf_score(
         caption: The caption to evaluate
         clap_model_name: CLAP model to use ('msclap', 'laionclap', 'mgaclap', 'm2dclap')
         lalm_model_name: LALM model to use ('audioflamingo3', 'qwen3omni')
-        alpha: Weight for CLAP score (1-alpha for FLEUR). Default: 0.5
+        alpha: Weight for CLAP score (1-alpha for FLEUR). Default: 0.8
         use_slide_window: Use sliding window for long audio in CLAP
         pooling: Pooling method for sliding window ('max' or 'mean')
         use_think_mode: Use thinking mode for LALM

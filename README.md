@@ -12,15 +12,44 @@ This repository provides:
 
 ## Installation
 
-### Using Conda
+Due to dependency conflicts between Audio-Flamingo-3 and Qwen3-Omni, **two separate conda environments** are required.
+
+### Environment 1: Audio-Flamingo-3 (`brace_af3`)
 
 ```bash
-# Create environment from yaml file
-conda env create -f environment.yaml
+# Create environment for Audio-Flamingo-3
+conda env create -f environment_af3.yml
 
 # Activate the environment
-conda activate caf_score
+conda activate brace_af3
 ```
+
+Use this environment when running evaluations with `--lalm_model audioflamingo3`.
+
+### Environment 2: Qwen3-Omni (`qwen3_omni`)
+
+```bash
+# Create environment for Qwen3-Omni
+conda env create -f environment_qwen3.yml
+
+# Activate the environment
+conda activate qwen3_omni
+
+# Install vllm from Qwen3-Omni compatible branch (required)
+pip install git+https://github.com/wangxiongts/vllm.git
+
+# Install flash-attention (recommended for better performance)
+pip install flash-attn --no-build-isolation
+```
+
+Use this environment when running evaluations with `--lalm_model qwen3omni`.
+
+### Environment Summary
+
+| Environment | LALM Model | Python | Key Dependencies |
+|-------------|------------|--------|------------------|
+| `brace_af3` | Audio-Flamingo-3 | 3.10 | transformers 5.x, torch 2.5 |
+| `qwen3_omni` | Qwen3-Omni | 3.10 | transformers 4.57, torch 2.7, vllm |
 
 ## Data Preparation
 
@@ -57,13 +86,16 @@ CAF_Score/
 │   ├── meta/             # BRACE dataset metadata
 │   └── results/          # Evaluation results
 ├── pretrained_models/    # Pre-trained model weights (not included)
-├── environment.yaml      # Conda environment specification
-└── requirements.txt      # Pip requirements
+├── environment_af3.yml   # Conda environment for Audio-Flamingo-3
+├── environment_qwen3.yml # Conda environment for Qwen3-Omni
+└── requirements.txt      # Pip requirements (deprecated, use yml files)
 ```
 
 ## Quick Start
 
-Before start, you must download the Qwen3-Omni models locally and set the following environment variables:
+### Prerequisites
+
+**For Qwen3-Omni**, download the models locally and set environment variables:
 ```bash
 # Set these to your local model directories
 export QWEN3_OMNI_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Instruct"
@@ -73,6 +105,10 @@ export QWEN3_OMNI_THINKING_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Thinking"
 Replace `/path/to/` with the actual paths where you downloaded the models.
 
 ### Single Audio-Caption CAF-Score
+
+**Important:** Activate the appropriate environment before running:
+- Use `conda activate brace_af3` for `--lalm_model audioflamingo3`
+- Use `conda activate qwen3_omni` for `--lalm_model qwen3omni`
 
 Compute CAF-Score for a single audio file and caption:
 
