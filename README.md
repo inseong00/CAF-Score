@@ -87,8 +87,7 @@ CAF_Score/
 │   └── results/          # Evaluation results
 ├── pretrained_models/    # Pre-trained model weights (not included)
 ├── environment_af3.yml   # Conda environment for Audio-Flamingo-3
-├── environment_qwen3.yml # Conda environment for Qwen3-Omni
-└── requirements.txt      # Pip requirements (deprecated, use yml files)
+└── environment_qwen3.yml # Conda environment for Qwen3-Omni
 ```
 
 ## Quick Start
