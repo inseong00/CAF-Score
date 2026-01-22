@@ -48,8 +48,8 @@ Use this environment when running evaluations with `--lalm_model qwen3omni`.
 
 | Environment | LALM Model | Python | Key Dependencies |
 |-------------|------------|--------|------------------|
-| `brace_af3` | Audio-Flamingo-3 | 3.10 | transformers 5.x, torch 2.5 |
-| `qwen3_omni` | Qwen3-Omni | 3.10 | transformers 4.57, torch 2.7, vllm |
+| `caf_af3` | Audio-Flamingo-3 | 3.10 | transformers 5.x, torch 2.5 |
+| `caf_qwen3` | Qwen3-Omni | 3.10 | transformers 4.57, torch 2.7, vllm |
 
 ## Data Preparation
 
