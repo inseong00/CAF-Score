@@ -51,6 +51,47 @@ Use this environment when running evaluations with `--lalm_model qwen3omni`.
 | `caf_af3` | Audio-Flamingo-3 | 3.10 | transformers 5.x, torch 2.5 |
 | `caf_qwen3` | Qwen3-Omni | 3.10 | transformers 4.57, torch 2.7, vllm |
 
+### Alternative: Docker
+
+As an alternative to conda environments, you can use Docker. Two separate Docker setups are provided under `docker/`.
+
+**Prerequisites:** [Docker](https://docs.docker.com/get-docker/) and [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) must be installed.
+
+#### Audio-Flamingo-3
+
+```bash
+cd docker/af3
+
+# Build and start the container
+docker compose up -d
+
+# Enter the container
+docker exec -it caf-af3 bash
+```
+
+#### Qwen3-Omni
+
+```bash
+cd docker/qwen3
+
+# Build and start the container
+docker compose up -d
+
+# Enter the container
+docker exec -it caf-score bash
+```
+
+#### Volume Mounts
+
+Both Docker setups automatically mount the following directories from the host:
+
+| Host Path | Container Path | Description |
+|-----------|---------------|-------------|
+| `.` (project root) | `/workspace/CAF-Score` | Source code |
+| `./pretrained_models` | `/workspace/CAF-Score/pretrained_models` | Model weights |
+| `~/.cache/huggingface` | `/root/.cache/huggingface` | HuggingFace cache |
+| `./data` | `/workspace/CAF-Score/data` | Dataset files |
+
 ## Data Preparation
 
 To run evaluations on the BRACE dataset, you need to place the audio files in the following directory structure:

@@ -1,0 +1,32 @@
+services:
+  caf-score:
+    build: .
+    image: caf-score:latest
+    container_name: caf-score
+
+    environment:
+      - CUDA_VISIBLE_DEVICES=0,1,2,3
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0', '1', '2', '3']
+              capabilities: [gpu]
+
+    volumes:
+      # Source code
+      - .:/workspace/CAF-Score
+      # Model weights
+      - ./pretrained_models:/workspace/CAF-Score/pretrained_models
+      # HuggingFace cache (prevent re-downloading models)
+      - ~/.cache/huggingface:/root/.cache/huggingface
+      # Data
+      - ./data:/workspace/CAF-Score/data
+
+    # Keep container running
+    stdin_open: true
+    tty: true
+
+    working_dir: /workspace/CAF-Score

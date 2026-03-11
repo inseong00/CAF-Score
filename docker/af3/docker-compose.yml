@@ -1,0 +1,34 @@
+services:
+  caf-af3:
+    build:
+      context: .
+      dockerfile: Dockerfile.af3
+    image: caf-af3:latest
+    container_name: caf-af3
+
+    environment:
+      - CUDA_VISIBLE_DEVICES=0,1,2,3
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0', '1', '2', '3']
+              capabilities: [gpu]
+
+    volumes:
+      # Source code
+      - .:/workspace/CAF-Score
+      # Model weights
+      - ./pretrained_models:/workspace/CAF-Score/pretrained_models
+      # HuggingFace cache
+      - ~/.cache/huggingface:/root/.cache/huggingface
+      # Data
+      - ./data:/workspace/CAF-Score/data
+
+    # Keep container running
+    stdin_open: true
+    tty: true
+
+    working_dir: /workspace/CAF-Score
