@@ -21,7 +21,7 @@ Due to dependency conflicts between Audio-Flamingo-3 and Qwen3-Omni, **two separ
 conda env create -f environment_af3.yml
 
 # Activate the environment
-conda activate brace_af3
+conda activate caf_af3
 ```
 
 Use this environment when running evaluations with `--lalm_model audioflamingo3`.
@@ -94,7 +94,7 @@ CAF_Score/
 
 ### Prerequisites
 
-**For Qwen3-Omni**, download the models locally and set environment variables:
+**For Qwen3-Omni**, if you have downloaded the models locally, set the paths via environment variables:
 ```bash
 # Set these to your local model directories
 export QWEN3_OMNI_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Instruct"
@@ -106,8 +106,8 @@ Replace `/path/to/` with the actual paths where you downloaded the models.
 ### Single Audio-Caption CAF-Score
 
 **Important:** Activate the appropriate environment before running:
-- Use `conda activate brace_af3` for `--lalm_model audioflamingo3`
-- Use `conda activate qwen3_omni` for `--lalm_model qwen3omni`
+- Use `conda activate caf_af3` for `--lalm_model audioflamingo3`
+- Use `conda activate caf_qwen3` for `--lalm_model qwen3omni`
 
 Compute CAF-Score for a single audio file and caption:
 
