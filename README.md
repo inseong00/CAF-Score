@@ -33,7 +33,7 @@ Use this environment when running evaluations with `--lalm_model audioflamingo3`
 conda env create -f environment_qwen3.yml
 
 # Activate the environment
-conda activate qwen3_omni
+conda activate caf_qwen3
 
 # Install vllm from Qwen3-Omni compatible branch (required)
 pip install git+https://github.com/wangxiongts/vllm.git
