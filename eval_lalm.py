@@ -10,6 +10,8 @@ import numpy as np
 from tqdm import tqdm
 from argparse import ArgumentParser
 
+from src.fleur import load_model as load_fleur_model, get_fleur
+
 
 def eval_lalm_on_dataset(args):
     """
@@ -54,12 +56,7 @@ def eval_lalm_on_dataset(args):
     # Load LALM model
     print(f"Loading {args.lalm_model} model...")
     print(f"Think mode: {args.use_think_mode}")
-    if args.lalm_model == 'qwen3omni':
-        from src.qwen3_fleur import load_model, get_fleur
-        llm, processor, tokenizer, sampling_params, rate2token = load_model(args)
-    elif args.lalm_model == 'audioflamingo3':
-        from src.af3_fleur import load_model, get_fleur
-        model, processor, rate2token = load_model(args)
+    fm = load_fleur_model(args.lalm_model, args)
 
     hh_total = 0
     fleur_hh_correct = 0
@@ -100,12 +97,8 @@ def eval_lalm_on_dataset(args):
             answer = value[-1]
 
             # Get FLEUR scores for both captions
-            if args.lalm_model == 'qwen3omni':
-                raw_score0, fleur_score0 = get_fleur(llm, processor, tokenizer, sampling_params, rate2token, caption0, audio_path)
-                raw_score1, fleur_score1 = get_fleur(llm, processor, tokenizer, sampling_params, rate2token, caption1, audio_path)
-            elif args.lalm_model == 'audioflamingo3':
-                raw_score0, fleur_score0 = get_fleur(model, processor, rate2token, caption0, audio_path)
-                raw_score1, fleur_score1 = get_fleur(model, processor, rate2token, caption1, audio_path)
+            raw_score0, fleur_score0 = get_fleur(fm, caption0, audio_path)
+            raw_score1, fleur_score1 = get_fleur(fm, caption1, audio_path)
 
             score0 = fleur_score0 if fleur_score0 is not None else 0
             score1 = fleur_score1 if fleur_score1 is not None else 0
@@ -224,7 +217,7 @@ def main():
         '--lalm_model',
         type=str,
         required=True,
-        choices=['audioflamingo3', 'qwen3omni'],
+        choices=['audioflamingo3', 'qwen3omni', 'qwen25omni-3b', 'qwen25omni-7b'],
         help='LALM model to use'
     )
     parser.add_argument(

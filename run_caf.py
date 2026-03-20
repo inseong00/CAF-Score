@@ -11,6 +11,7 @@ import os
 import argparse
 
 from src.clap import load_clap
+from src.fleur import load_model as load_fleur_model, get_fleur
 
 
 def compute_caf_score(
@@ -30,7 +31,7 @@ def compute_caf_score(
         audio_path: Path to the audio file
         caption: The caption to evaluate
         clap_model_name: CLAP model to use ('msclap', 'laionclap', 'mgaclap', 'm2dclap')
-        lalm_model_name: LALM model to use ('audioflamingo3', 'qwen3omni')
+        lalm_model_name: LALM model to use ('audioflamingo3', 'qwen3omni', 'qwen25omni-3b', 'qwen25omni-7b')
         alpha: Weight for CLAP score (1-alpha for FLEUR). Default: 0.8
         use_slide_window: Use sliding window for long audio in CLAP
         pooling: Pooling method for sliding window ('max' or 'mean')
@@ -58,26 +59,20 @@ def compute_caf_score(
     )
     clap_score = max(float(clap_similarity[0, 0].cpu()), 0.0)
 
-    # Create args object for LALM model loading
+    # Load LALM model and compute FLEUR score
     class Args:
         pass
     args = Args()
     args.use_think_mode = use_think_mode
+    args.lalm_model = lalm_model_name
 
+    # For single-file evaluation, use torch backend (no vLLM) for qwen3
+    load_kwargs = {}
     if lalm_model_name == 'qwen3omni':
-        from src.qwen3_fleur_single import load_model, get_fleur
-        model, processor, rate2token = load_model(args)
-        raw_fleur_score, fleur_score = get_fleur(
-            model, processor, rate2token, caption, audio_path
-        )
-    elif lalm_model_name == 'audioflamingo3':
-        from src.af3_fleur import load_model, get_fleur
-        model, processor, rate2token = load_model(args)
-        raw_fleur_score, fleur_score = get_fleur(
-            model, processor, rate2token, caption, audio_path
-        )
-    else:
-        raise ValueError(f"Unknown LALM model: {lalm_model_name}")
+        load_kwargs['use_vllm'] = False
+
+    fm = load_fleur_model(lalm_model_name, args, **load_kwargs)
+    raw_fleur_score, fleur_score = get_fleur(fm, caption, audio_path)
 
     # Handle None values
     fleur_score = fleur_score if fleur_score is not None else 0.0
@@ -142,7 +137,7 @@ Examples:
         '--lalm_model',
         type=str,
         required=True,
-        choices=['audioflamingo3', 'qwen3omni'],
+        choices=['audioflamingo3', 'qwen3omni', 'qwen25omni-3b', 'qwen25omni-7b'],
         help='LALM model for FLEUR scoring (default: audioflamingo3)'
     )
     parser.add_argument(

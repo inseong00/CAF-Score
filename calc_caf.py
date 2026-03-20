@@ -201,7 +201,7 @@ def main():
         '--lalm_model',
         type=str,
         required=True,
-        choices=['audioflamingo3', 'qwen3omni'],
+        choices=['audioflamingo3', 'qwen3omni', 'qwen25omni-3b', 'qwen25omni-7b'],
         help='LALM model to use'
     )
     parser.add_argument(

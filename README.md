@@ -6,13 +6,13 @@ CAF-Score is a comprehensive reference-free audio-caption alignment evaluation m
 
 This repository provides:
 - **CLAP Evaluation**: Unified interface for multiple CLAP models (MS-CLAP, LAION-CLAP, MGA-CLAP, M2D-CLAP)
-- **LALM Evaluation**: FLEUR metric implementation for Audio-Flamingo-3 and Qwen3-Omni
+- **LALM Evaluation**: FLEUR metric implementation for Audio-Flamingo-3, Qwen3-Omni, and Qwen2.5-Omni
 - **CAF-Score Computation**: Combined metric for robust audio-caption alignment assessment
 - **BRACE Benchmark Evaluation**: Evaluation scripts for the BRACE dataset
 
 ## Installation
 
-Due to dependency conflicts between Audio-Flamingo-3 and Qwen3-Omni, **two separate conda environments** are required.
+Due to dependency conflicts between Audio-Flamingo-3 and Qwen-Omni models, **two separate conda environments** are required.
 
 ### Environment 1: Audio-Flamingo-3
 
@@ -26,10 +26,10 @@ conda activate caf_af3
 
 Use this environment when running evaluations with `--lalm_model audioflamingo3`.
 
-### Environment 2: Qwen3-Omni
+### Environment 2: Qwen-Omni (Qwen3-Omni / Qwen2.5-Omni)
 
 ```bash
-# Create environment for Qwen3-Omni
+# Create environment for Qwen-Omni
 conda env create -f environment_qwen3.yml
 
 # Activate the environment
@@ -42,14 +42,14 @@ pip install git+https://github.com/wangxiongts/vllm.git
 pip install flash-attn --no-build-isolation
 ```
 
-Use this environment when running evaluations with `--lalm_model qwen3omni`.
+Use this environment when running evaluations with `--lalm_model qwen3omni`, `qwen25omni-3b`, or `qwen25omni-7b`.
 
 ### Environment Summary
 
 | Environment | LALM Model | Python | Key Dependencies |
 |-------------|------------|--------|------------------|
 | `caf_af3` | Audio-Flamingo-3 | 3.10 | transformers 5.x, torch 2.5 |
-| `caf_qwen3` | Qwen3-Omni | 3.10 | transformers 4.57, torch 2.7, vllm |
+| `caf_qwen3` | Qwen3-Omni, Qwen2.5-Omni | 3.10 | transformers 4.57, torch 2.7, vllm |
 
 ### Alternative: Docker
 
@@ -114,9 +114,11 @@ CAF_Score/
 ├── calc_caf.py                 # CAF-Score calculation from pre-computed results
 ├── src/
 │   ├── clap.py                 # Unified CLAP model wrapper
-│   ├── af3_fleur.py            # Audio-Flamingo-3 FLEUR implementation
-│   ├── qwen3_fleur.py          # Qwen3-Omni FLEUR implementation with vLLM
-│   ├── qwen3_fleur_single.py   # Qwen3-Omni FLEUR implementation without vLLM
+│   ├── fleur/                  # FLEUR metric module
+│   │   ├── __init__.py         # Unified API: load_model(), get_fleur()
+│   │   ├── base.py             # Shared: FleurModel, prompt, score smoothing
+│   │   ├── af3.py              # Audio-Flamingo-3 backend
+│   │   └── qwen.py             # Qwen3-Omni / Qwen2.5-Omni backend (vLLM & torch)
 │   └── models/                 # Model implementations (MGA-CLAP, M2D-CLAP)
 ├── configs/
 │   └── mgaclap_config.yaml
@@ -128,18 +130,22 @@ CAF_Score/
 │   └── results/          # Evaluation results
 ├── pretrained_models/    # Pre-trained model weights (not included)
 ├── environment_af3.yml   # Conda environment for Audio-Flamingo-3
-└── environment_qwen3.yml # Conda environment for Qwen3-Omni
+└── environment_qwen3.yml # Conda environment for Qwen-Omni
 ```
 
 ## Quick Start
 
 ### Prerequisites
 
-**For Qwen3-Omni**, if you have downloaded the models locally, set the paths via environment variables:
+**For Qwen-Omni models**, if you have downloaded the models locally, set the paths via environment variables:
 ```bash
-# Set these to your local model directories
+# Qwen3-Omni
 export QWEN3_OMNI_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Instruct"
 export QWEN3_OMNI_THINKING_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Thinking"
+
+# Qwen2.5-Omni
+export QWEN25_OMNI_3B_MODEL_PATH="/path/to/Qwen2.5-Omni-3B"
+export QWEN25_OMNI_7B_MODEL_PATH="/path/to/Qwen2.5-Omni-7B"
 ```
 
 Replace `/path/to/` with the actual paths where you downloaded the models.
@@ -148,7 +154,7 @@ Replace `/path/to/` with the actual paths where you downloaded the models.
 
 **Important:** Activate the appropriate environment before running:
 - Use `conda activate caf_af3` for `--lalm_model audioflamingo3`
-- Use `conda activate caf_qwen3` for `--lalm_model qwen3omni`
+- Use `conda activate caf_qwen3` for `--lalm_model qwen3omni`, `qwen25omni-3b`, or `qwen25omni-7b`
 
 Compute CAF-Score for a single audio file and caption:
 
@@ -226,8 +232,6 @@ python eval_clap.py --clap_model mgaclap --dataset audiocaps_hallu \
 
 ### 2. LALM Evaluation (FLEUR)
 
-
-
 Evaluate using Large Audio Language Models:
 
 ```bash
@@ -238,7 +242,11 @@ python eval_lalm.py --lalm_model audioflamingo3 --dataset audiocaps_main
 python eval_lalm.py --lalm_model qwen3omni --dataset clotho_main \
     --tensor_parallel_size 2
 
-# With thinking mode
+# Using Qwen2.5-Omni (3B or 7B)
+python eval_lalm.py --lalm_model qwen25omni-7b --dataset audiocaps_main \
+    --tensor_parallel_size 2
+
+# With thinking mode (Qwen3-Omni only)
 python eval_lalm.py --lalm_model qwen3omni --dataset audiocaps_hallu \
     --use_think_mode
 ```
@@ -281,8 +289,10 @@ Where:
 | Model | Access |
 |-------|--------|
 | Audio-Flamingo-3 | [HuggingFace](https://huggingface.co/nvidia/audio-flamingo-3-hf) |
-| Qwen3-Omni-Instruct| [HuggingFace](https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Instruct) |
-| Qwen3-Omni-Thinking| [HuggingFace](https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Thinking) |
+| Qwen3-Omni-Instruct | [HuggingFace](https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Instruct) |
+| Qwen3-Omni-Thinking | [HuggingFace](https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Thinking) |
+| Qwen2.5-Omni-3B | [HuggingFace](https://huggingface.co/Qwen/Qwen2.5-Omni-3B) |
+| Qwen2.5-Omni-7B | [HuggingFace](https://huggingface.co/Qwen/Qwen2.5-Omni-7B) |
 
 ## BRACE Dataset
 
@@ -350,3 +360,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [M2D-CLAP](https://github.com/nttcslab/m2d) - M2D-CLAP implementation
 - [Audio-Flamingo-3](https://huggingface.co/nvidia/audio-flamingo-3-hf) - NVIDIA Audio-Flamingo3 model
 - [Qwen3-Omni](https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Instruct) - Qwen3 Omni model
+- [Qwen2.5-Omni](https://huggingface.co/Qwen/Qwen2.5-Omni-7B) - Qwen2.5 Omni model
