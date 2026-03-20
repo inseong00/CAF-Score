@@ -31,8 +31,8 @@ from qwen_omni_utils import process_mm_info
 
 # Model paths
 MODEL_PATHS = {
-    'qwen25omni_7b': "/home/inseong6474/NC-AI/models/Qwen2.5-Omni-7B",
-    'qwen25omni_3b': "/home/inseong6474/NC-AI/models/Qwen2.5-Omni-3B",
+    'qwen25omni_7b': "/path/to/Qwen2.5-Omni-7B",
+    'qwen25omni_3b': "/path/to/Qwen2.5-Omni-3B",
 }
 
 
