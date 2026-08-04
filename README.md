@@ -1,13 +1,15 @@
-# CAF-Score: Calibrating CLAP with LALMs for Reference-Free Audio Caption Evaluation
+# CAF-Score: Calibrating CLAP with LALMs for Reference-Free Audio-Text Alignment Evaluation
 
-CAF-Score is a comprehensive reference-free audio-caption alignment evaluation metric that combines **CLAP** (Contrastive Language-Audio Pretraining) similarity scores with **[FLEUR](https://github.com/Yebin46/FLEUR)** scores from Large Audio Language Models (LALMs).
+CAF-Score is a reference-free audio-text alignment evaluation metric that combines **CLAP** (Contrastive Language-Audio Pretraining) similarity scores with **[FLEUR](https://github.com/Yebin46/FLEUR)** scores from Large Audio Language Models (LALMs). A single configuration applies to both alignment directions: judging a caption against a given audio (audio captioning evaluation) and judging a generated audio against a given text prompt (text-to-audio evaluation).
+
+> **Scope note:** This repository currently covers the **audio captioning evaluation direction** (the BRACE benchmark). Evaluation scripts for the **text-to-audio (TTA) direction** (RELATE and PAM) will be added.
 
 ## Overview
 
 This repository provides:
 - **CLAP Evaluation**: Unified interface for multiple CLAP models (MS-CLAP, LAION-CLAP, MGA-CLAP, M2D-CLAP)
 - **LALM Evaluation**: FLEUR metric implementation for Audio-Flamingo-3, Qwen3-Omni, and Qwen2.5-Omni
-- **CAF-Score Computation**: Combined metric for robust audio-caption alignment assessment
+- **CAF-Score Computation**: Combined metric for robust audio-text alignment assessment
 - **BRACE Benchmark Evaluation**: Evaluation scripts for the BRACE dataset
 
 ## Installation
@@ -107,7 +109,7 @@ data/
 
 ```bash
 CAF_Score/
-├── run_caf.py                  # Single audio-caption CAF-Score computation
+├── run_caf.py                  # Single audio-text CAF-Score computation
 ├── eval_caf.py                 # Direct CAF-Score evaluation on BRACE dataset
 ├── eval_clap.py                # CLAP model evaluation script
 ├── eval_lalm.py                # LALM (FLEUR) evaluation script
@@ -150,7 +152,7 @@ export QWEN25_OMNI_7B_MODEL_PATH="/path/to/Qwen2.5-Omni-7B"
 
 Replace `/path/to/` with the actual paths where you downloaded the models.
 
-### Single Audio-Caption CAF-Score
+### Single Audio-Text CAF-Score
 
 **Important:** Activate the appropriate environment before running:
 - Use `conda activate caf_af3` for `--lalm_model audioflamingo3`
@@ -210,7 +212,7 @@ python eval_caf.py --lalm_model qwen3omni --clap_model laionclap \
 
 ### 1. CLAP Evaluation
 
-Evaluate audio-caption alignment using CLAP models:
+Evaluate audio-text alignment using CLAP models:
 
 ```bash
 # Using MS-CLAP
@@ -269,8 +271,8 @@ CAF-Score = α × CLAP_Score + (1 - α) × FLEUR_Score
 ```
 
 Where:
-- `α` (alpha): Weight parameter (default: 0.8)
-- `CLAP_Score`: Audio-text similarity from CLAP model
+- `α` (alpha): Weight parameter (default: 0.8, selected once on BRACE-Main and used unchanged for all evaluations)
+- `CLAP_Score`: Audio-text similarity from CLAP model (S-CLAPScore when the sliding window is enabled)
 - `FLEUR_Score`: Smoothed evaluation score from LALM
 
 ## Pre-trained Models
@@ -296,7 +298,7 @@ Where:
 
 ## BRACE Dataset
 
-The BRACE (Benchmark for Rating Audio Caption Evaluation) dataset provides standardized evaluation for audio captioning metrics. Download the dataset from the [official repository](https://github.com/HychTus/BRACE_Evaluation).
+BRACE (a benchmark for robust audio caption quality evaluation) provides standardized, reference-free evaluation for audio captioning metrics. Download the dataset from the [official repository](https://github.com/HychTus/BRACE_Evaluation).
 
 ### Audio File Setup
 For evaluation, place your audio files according to the following paths:
@@ -327,7 +329,7 @@ You can also use CAF-Score programmatically:
 ```python
 from run_caf import compute_caf_score
 
-# Compute CAF-Score for a single audio-caption pair
+# Compute CAF-Score for a single audio-text pair
 result = compute_caf_score(
     audio_path="/path/to/audio.wav",
     caption="A dog barking loudly",
